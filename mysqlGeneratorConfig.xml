@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!-- 配置生成器 -->
+<generatorConfiguration>
+	<!-- 在MBG工作的时候，需要额外加载的依赖包location属性指明加载jar/zip包的全路径-->
+	<!-- <classPathEntry location="/Program Files/IBM/SQLLIB/java/db2java.zip" />-->
+	<classPathEntry location="mysql-connector-java-5.1.40.jar" />
+	<!-- 元素类型为 "context" 的内容必须匹配 "(property*,plugin*,commentGenerator?,jdbcConnection,javaTypeResolver?,javaModelGenerator,sqlMapGenerator?,javaClientGenerator?,table+)"-->
+	<context id="MyBatis3" targetRuntime="MyBatis3" defaultModelType="flat">
+		<property name="javaFileEncoding" value="UTF-8"/>	
+		<plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+		<!-- MyBatis获取插入记录的自增长字段值 -->
+		<plugin type="org.mybatis.generator.plugins.UseGeneratedKeysPlugin"/>
+		<!-- 实体类实现序列化 -->
+		<plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>	
+	    <!-- 给mapper接口添加注解@Repository-->
+        <plugin type="org.mybatis.generator.plugins.MapperAnnotationPlugin"/>
+	 	<!-- 生成serveice层代码 -->
+        <plugin type="org.mybatis.generator.plugins.MybatisServicePlugin">
+			<property name="targetPackage" value="cn.com.scooper.service.base" />
+			<property name="implementationPackage" value="cn.com.scooper.impl.base"/>
+			<property name="targetProject" value="src" />
+			<property name="enableAnnotation" value="true"/>
+		</plugin>
+		<!-- 生成controller层代码-->
+		<plugin type="org.mybatis.generator.plugins.MybatisControllerPlugin">
+			<property name="servicePackage" value="cn.com.scooper.service.base"/> 
+			<property name="controllerPackage" value="cn.com.scooper.controller.data" />
+			<property name="targetProject" value="src"/>
+			<property name="enableAnnotation" value="true"/>
+		</plugin>
+        <!-- 实体类添加注释信息 -->
+		<commentGenerator type="org.mybatis.generator.codegen.mybatis3.model.MyCommentGenerator"/>
+                   
+   		<!-- 【数据库连接，必须要有的，使用这个配置链接数据库】-->
+		<!-- @TODO:是否可以扩展-->
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://192.168.106.28:3306/DB_ROTA?useSSL=false" userId="showclear" password="showclear">
+        	<!-- 这里面可以设置property属性，每一个property属性都设置到配置的Driver上 -->
+    	</jdbcConnection>
+
+    	<javaTypeResolver type="org.mybatis.generator.internal.types.JavaTypeResolverDefaultImpl">
+	        <!-- 
+	            true：使用BigDecimal对应DECIMAL和 NUMERIC数据类型
+	            false：默认,
+                scale>0;length>18：使用BigDecimal;
+                scale=0;length[10,18]：使用Long；
+                scale=0;length[5,9]：使用Integer；
+                scale=0;length<5：使用Short；
+	         -->
+        	<property name="forceBigDecimals" value="false"/>
+    	</javaTypeResolver>
+    	
+		<!-- 【生成实体类】 -->
+		<!-- java模型创建器，是必须要的元素负责：-->
+        <!-- 1，key类（见context的defaultModelType）；-->
+        <!-- 2，java类；-->
+        <!-- 3，查询类-->
+        <!-- targetPackage：生成的类要放的包，真实的包受enableSubPackages属性控制；-->
+        <!-- targetProject：目标项目，指定一个存在的目录下，生成的内容会放到指定目录中，如果目录不存在，MBG不会自动建目录-->
+		<javaModelGenerator targetPackage="cn.com.scooper.pojo.po.base" targetProject="src">    <!-- ../mybatis-generator/src/main/java -->
+			<!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false --> 
+			<property name="enableSubPackages" value="true" />
+			<!-- for MyBatis3/MyBatis3Simple自动为每一个生成的类创建一个构造方法，构造方法包含了所有的field；而不是使用setter；-->
+        	<!--<property name="constructorBased" value="false"/> -->
+			<!-- for MyBatis3 / MyBatis3Simple 是否创建一个不可变的类，如果为true，-->
+            <!-- 那么MBG会创建一个没有setter方法的类，取而代之的是类似constructorBased的类 -->
+        	<!--<property name="immutable" value="false"/>-->
+			<!-- 设置一个根对象， 如果设置了这个根对象，那么生成的keyClass或者recordClass会继承这个类；在Table的rootClass属性中-->
+			<!-- 可以覆盖该选项注意：如果在key class或者record class中有root class相同的属性，MBG就不会重新生成这些属性了，包括：-->
+            <!-- 1，属性名相同，类型相同，有相同的getter/setter方法； -->
+        	<!--<property name="rootClass" value="com._520it.mybatis.domain.BaseDomain"/>-->
+			<!-- 设置是否在getter方法中，对String类型字段调用trim()方法  -->
+        	<!-- <property name="trimStrings" value="true"/> --> 
+		</javaModelGenerator>
+		
+		<!--【生成映射XML】-->
+		<sqlMapGenerator targetPackage="resources.config.mappers.base.rota" targetProject="src">
+			<!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
+        	<property name="enableSubPackages" value="true"/>
+		</sqlMapGenerator> 
+		
+		<!-- 【生成映射类】 -->
+		<javaClientGenerator type="XMLMAPPER" targetPackage="cn.com.scooper.dao.base" targetProject="src">
+			<!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
+			<property name="enableSubPackages" value="true" />
+			<!-- 可以为所有生成的接口添加一个父接口，但是MBG只负责生成，不负责检查-->
+			<property name="rootInterface" value=""/> 
+		</javaClientGenerator> 
+		
+		<!-- 【映射数据表】 -->
+		<!-- ！！！所配置表必须设置主键，否则会报错！！！ -->
+		<table tableName="T_ROTA_NOTE" domainObjectName="Note" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" 
+		selectByExampleQueryId="false">
+		<!-- 如果数据库中的字段为text或者blob这种大文本类型时，使用columnOverride，column为你需要覆盖的数据库字段，jdbcType为指定的类型-->
+			<!-- <columnOverride column="note_data" jdbcType="VARCHAR"/> -->
+		</table>
+
+	</context>
+</generatorConfiguration>
